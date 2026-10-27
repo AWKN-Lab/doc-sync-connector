@@ -1,0 +1,53 @@
+# Connector configuration for the authorised-document sync.
+#
+# Two sources, two different permission vocabularies, one sync client. The
+# permission_map is what lets a document's source-side permission be carried
+# into the target without flattening it to a single "accessible" flag.
+
+version: "1.0.0"
+
+sync:
+  page_size: 2
+  max_retries: 3
+  retry_backoff_s: 0.2
+  request_timeout_s: 10
+  # a document whose source permission is in this list is synced read-only
+  # regardless of what the source says
+  force_read_only_queues: [shared_with_audience]
+
+sources:
+  - name: feishu-wiki
+    type: feishu
+    base_url: http://127.0.0.1:8098/feishu
+    auth:
+      mode: bearer
+      token: "mock-feishu-token"
+    permission_map:
+      full_access: full
+      edit: write
+      read: read
+      none: none
+    # source permission values that mean "not shareable outside the source"
+    blocked_permissions: [none]
+
+  - name: wps-docs
+    type: wps
+    base_url: http://127.0.0.1:8098/wps
+    auth:
+      mode: header
+      header: X-Wps-Token
+      token: "mock-wps-token"
+    permission_map:
+      owner: full
+      collaborator: write
+      viewer: read
+      restricted: none
+    blocked_permissions: [restricted]
+
+# Target-side permission vocabulary. The mapping is explicit so that a
+# mismatch is a configuration error, not a silent downgrade.
+target_permissions:
+  full: full
+  write: write
+  read: read
+  none: none

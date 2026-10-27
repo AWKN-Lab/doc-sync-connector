@@ -1,0 +1,133 @@
+{
+  "generated_at": "2026-10-27T09:01:38Z",
+  "config": "connector/config.yaml",
+  "sources": [
+    {
+      "name": "feishu-wiki",
+      "pages": 3,
+      "documents": 5,
+      "synced": 3,
+      "skipped_permission": 2,
+      "failed": 0,
+      "retries": 0,
+      "errors": []
+    },
+    {
+      "name": "wps-docs",
+      "pages": 2,
+      "documents": 3,
+      "synced": 2,
+      "skipped_permission": 1,
+      "failed": 0,
+      "retries": 1,
+      "errors": []
+    }
+  ],
+  "documents": [
+    {
+      "id": "f-1",
+      "title": "Onboarding guide",
+      "source": "feishu-wiki",
+      "source_permission": "full_access",
+      "target_permission": "full",
+      "status": "synced",
+      "content_sha256": "27b02a5f214dc590cf172fbb580ddca2e1c393c720f66f70e2f9449bd5c82883",
+      "bytes": 50,
+      "page": 1,
+      "detail": ""
+    },
+    {
+      "id": "f-2",
+      "title": "Restricted roadmap",
+      "source": "feishu-wiki",
+      "source_permission": "read",
+      "target_permission": null,
+      "status": "skipped_permission",
+      "content_sha256": null,
+      "bytes": null,
+      "page": 1,
+      "detail": "the token may not read this document (HTTP 403): {\"error\": \"permission_denied\", \"doc\": \"f-2\", \"hint\": \"the token may not read this document\"}"
+    },
+    {
+      "id": "f-3",
+      "title": "Meeting notes 2026-10",
+      "source": "feishu-wiki",
+      "source_permission": "edit",
+      "target_permission": "write",
+      "status": "synced",
+      "content_sha256": "b36006afcfdf41636564dc0a4ff7812722d1dd708624a7acf08aff468a467738",
+      "bytes": 40,
+      "page": 2,
+      "detail": ""
+    },
+    {
+      "id": "f-4",
+      "title": "Personal notes",
+      "source": "feishu-wiki",
+      "source_permission": "none",
+      "target_permission": null,
+      "status": "skipped_permission",
+      "content_sha256": null,
+      "bytes": null,
+      "page": 2,
+      "detail": "source permission 'none' is blocked for this source; not fetched"
+    },
+    {
+      "id": "f-5",
+      "title": "Runbook",
+      "source": "feishu-wiki",
+      "source_permission": "full_access",
+      "target_permission": "full",
+      "status": "synced",
+      "content_sha256": "4675c6198961e17508c504da9646bf3f5ad96b7e5b28c4c12da3e83a68ddf4c5",
+      "bytes": 36,
+      "page": 3,
+      "detail": ""
+    },
+    {
+      "id": "w-1",
+      "title": "Contract template",
+      "source": "wps-docs",
+      "source_permission": "owner",
+      "target_permission": "full",
+      "status": "synced",
+      "content_sha256": "f455ca0a34b26e52e444fed2e3defe6a0551bc0bfc4595b1efd1671aabba363f",
+      "bytes": 36,
+      "page": 1,
+      "detail": ""
+    },
+    {
+      "id": "w-2",
+      "title": "Shared budget",
+      "source": "wps-docs",
+      "source_permission": "restricted",
+      "target_permission": null,
+      "status": "skipped_permission",
+      "content_sha256": null,
+      "bytes": null,
+      "page": 1,
+      "detail": "source permission 'restricted' is blocked for this source; not fetched"
+    },
+    {
+      "id": "w-3",
+      "title": "Meeting minutes",
+      "source": "wps-docs",
+      "source_permission": "collaborator",
+      "target_permission": "write",
+      "status": "synced",
+      "content_sha256": "338c86596c11ebacba1dde06f469938e3b160f500bc39c0c32b315e2570030b6",
+      "bytes": 27,
+      "page": 2,
+      "detail": ""
+    }
+  ],
+  "totals": {
+    "sources": 2,
+    "pages": 5,
+    "documents": 8,
+    "synced": 5,
+    "skipped_permission": 3,
+    "failed": 0,
+    "retries": 1
+  }
+}

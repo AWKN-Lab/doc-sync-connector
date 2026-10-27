@@ -1,0 +1,89 @@
+── environment ──
+python: Python 3.11.2
+pyyaml: 6.0.3
+date:   2026-10-27T09:01:35Z
+
+── 1. the configuration ──
+$ sed -n 1,40p connector/config.yaml
+# Connector configuration for the authorised-document sync.
+#
+# Two sources, two different permission vocabularies, one sync client. The
+# permission_map is what lets a document's source-side permission be carried
+# into the target without flattening it to a single "accessible" flag.
+
+version: "1.0.0"
+
+sync:
+  page_size: 2
+  max_retries: 3
+  retry_backoff_s: 0.2
+  request_timeout_s: 10
+  # a document whose source permission is in this list is synced read-only
+  # regardless of what the source says
+  force_read_only_queues: [shared_with_audience]
+
+sources:
+  - name: feishu-wiki
+    type: feishu
+    base_url: http://127.0.0.1:8098/feishu
+    auth:
+      mode: bearer
+      token: "mock-feishu-token"
+    permission_map:
+      full_access: full
+      edit: write
+      read: read
+      none: none
+    # source permission values that mean "not shareable outside the source"
+    blocked_permissions: [none]
+
+  - name: wps-docs
+    type: wps
+    base_url: http://127.0.0.1:8098/wps
+    auth:
+      mode: header
+      header: X-Wps-Token
+      token: "mock-wps-token"
+    permission_map:
+[exit 0]
+
+── 2. start the local stand-in source ──
+$ cat /workspace/work/bid-1519/doc-sync-connector/evidence/mock.log
+mock document source listening on http://127.0.0.1:8098
+[exit 0]
+
+── 3. the paginated sync ──
+$ /workspace/.venv-clawhunt/bin/python connector/sync.py --config connector/config.yaml --out /workspace/work/bid-1519/doc-sync-connector/evidence/sync-report.json
+feishu-wiki: 3 page(s), 5 document(s), synced=3 skipped_permission=2 failed=0 retries=0
+wps-docs: 2 page(s), 3 document(s), synced=2 skipped_permission=1 failed=0 retries=1
+totals: 8 document(s) over 5 page(s); synced=5 skipped_permission=3 failed=0
+report: /workspace/work/bid-1519/doc-sync-connector/evidence/sync-report.json
+[exit 0]
+
+── 4. the sync report — pages, sources, permissions ──
+$ /workspace/.venv-clawhunt/bin/python - /workspace/work/bid-1519/doc-sync-connector/evidence/sync-report.json
+totals: {"sources": 2, "pages": 5, "documents": 8, "synced": 5, "skipped_permission": 3, "failed": 0, "retries": 1}
+
+source         pages docs synced skipped failed retries
+feishu-wiki        3    5      3       2      0       0
+wps-docs           2    3      2       1      0       1
+
+per document:
+  id     source        src perm     target   status               page  sha256
+  f-1    feishu-wiki   full_access  full     synced               1    27b02a5f214d
+  f-2    feishu-wiki   read         -        skipped_permission   1    -
+  f-3    feishu-wiki   edit         write    synced               2    b36006afcfdf
+  f-4    feishu-wiki   none         -        skipped_permission   2    -
+  f-5    feishu-wiki   full_access  full     synced               3    4675c6198961
+  w-1    wps-docs      owner        full     synced               1    f455ca0a34b2
+  w-2    wps-docs      restricted   -        skipped_permission   1    -
+  w-3    wps-docs      collaborator write    synced               2    338c86596c11
+
+permission-failure examples:
+  f-2: the token may not read this document (HTTP 403): {"error": "permission_denied", "doc": "f-2", "hint": "the token may not read this document"}
+  f-4: source permission 'none' is blocked for this source; not fetched
+  w-2: source permission 'restricted' is blocked for this source; not fetched
+[exit 0]
+
+OVERALL: PASS
+log: /workspace/work/bid-1519/doc-sync-connector/evidence/run.log
